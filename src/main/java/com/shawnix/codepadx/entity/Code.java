@@ -1,5 +1,6 @@
 package com.shawnix.codepadx.entity;
 
+import com.shawnix.codepadx.entity.enums.Visibility;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -22,6 +23,11 @@ public class Code {
 
     @Lob
     private String input;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @ColumnDefault("'PUBLIC'")
+    private Visibility visibility;
 
     @ManyToOne
     @JoinColumn(name = "language_id", nullable = false)
