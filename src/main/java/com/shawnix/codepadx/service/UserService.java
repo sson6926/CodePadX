@@ -44,6 +44,7 @@ public class UserService {
     public List<UserResponse> getAllUser() {
         return userRepository.findAll().stream().map(
                 u -> UserResponse.builder()
+                        .id(u.getId())
                         .username(u.getUsername())
                         .name(u.getName())
                         .email(u.getEmail()).build()
