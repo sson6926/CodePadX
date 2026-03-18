@@ -26,6 +26,13 @@ public class User {
     private String email;
     private String password;
     private String photo;
+    @Enumerated(EnumType.STRING)
     private Role role;
     private LocalDateTime createdAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
 }
