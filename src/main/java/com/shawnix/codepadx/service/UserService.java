@@ -47,7 +47,10 @@ public class UserService {
                         .id(u.getId())
                         .username(u.getUsername())
                         .name(u.getName())
-                        .email(u.getEmail()).build()
+                        .email(u.getEmail())
+                        .role(u.getRole())
+                        .createdAt(u.getCreatedAt())
+                        .build()
         ).toList();
 
     }
