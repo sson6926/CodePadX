@@ -2,13 +2,9 @@ package com.shawnix.codepadx.dto.request.code;
 
 import java.time.LocalDateTime;
 
-public class CodeRequest {
-    int id;
+public class SaveCodeRequest {
     String title;
     String sourceCode;
     String input;
     int languageId;
-    int userId;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
 }

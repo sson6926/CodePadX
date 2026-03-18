@@ -1,8 +1,8 @@
-package com.shawnix.codepadx.dto.request.code;
+package com.shawnix.codepadx.dto.response.code;
 
 import java.time.LocalDateTime;
 
-public class CodeRequest {
+public class CodeResponse {
     int id;
     String title;
     String sourceCode;
