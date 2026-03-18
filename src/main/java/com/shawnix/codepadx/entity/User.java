@@ -1,5 +1,6 @@
 package com.shawnix.codepadx.entity;
 
+import com.shawnix.codepadx.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
     @Column(nullable = false)
     private String name;
     @Column(unique = true, nullable = false)
@@ -25,6 +26,6 @@ public class User {
     private String email;
     private String password;
     private String photo;
-    private String role;
+    private Role role;
     private LocalDateTime createdAt;
 }
