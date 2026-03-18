@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class CreateUserRequest {
-    private String fullName;
+    private String name;
     @Size(min = 6, message = "Username toi thieu 6 ki tu")
     @Size(max = 15, message = "Username ko qua 15 ki tu")
     private String username;
