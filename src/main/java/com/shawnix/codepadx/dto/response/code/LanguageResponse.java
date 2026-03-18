@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LanguageResponse {
-    private int id;
+    private Long id;
     private String code;
     private String name;
     private String fileExtension;

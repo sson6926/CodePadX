@@ -25,5 +25,4 @@ public class LanguageController {
                 .message("Get all languages ok")
                 .build();
     }
-    
 }
