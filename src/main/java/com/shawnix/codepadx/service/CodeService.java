@@ -92,7 +92,6 @@ public class CodeService {
                 .createdAt(updatedCode.getCreatedAt())
                 .updatedAt(updatedCode.getUpdatedAt())
                 .build();
-
     }
 
     public CodeResponse getCodeById(Long id) {
@@ -108,4 +107,6 @@ public class CodeService {
                 .updatedAt(code.getUpdatedAt())
                 .build();
     }
+
+
 }
