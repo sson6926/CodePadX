@@ -22,7 +22,7 @@ public class UserService {
 
     public CreateUserResponse createUser(CreateUserRequest request) {
         if(userRepository.existsUserByUsername(request.getUsername())) {
-            throw new AppException(ErrorCode.USER_EXISTED);
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
         } else {
             User user = User.builder()
                     .name(request.getName())

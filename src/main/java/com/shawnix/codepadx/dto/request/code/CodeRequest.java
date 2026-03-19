@@ -1,5 +1,11 @@
 package com.shawnix.codepadx.dto.request.code;
 
-public class CodeRequest {
+import java.time.LocalDateTime;
 
+public class CodeRequest {
+    int id;
+    String title;
+    String sourceCode;
+    String input;
+    int languageId;
 }
