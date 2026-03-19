@@ -1,18 +1,16 @@
 package com.shawnix.codepadx.dto.request.code;
 
-import com.shawnix.codepadx.entity.enums.Visibility;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaveCodeRequest {
+public class UpdateCodeRequest {
     String title;
     @NotBlank(message = "Source code cannot be blank")
     @NotNull(message = "Source code cannot be null")

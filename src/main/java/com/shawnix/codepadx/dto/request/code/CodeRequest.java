@@ -8,7 +8,4 @@ public class CodeRequest {
     String sourceCode;
     String input;
     int languageId;
-    int userId;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
 }
