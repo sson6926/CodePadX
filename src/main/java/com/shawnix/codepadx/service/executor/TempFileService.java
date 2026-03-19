@@ -3,6 +3,7 @@ package com.shawnix.codepadx.service.executor;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.Random;
 import java.util.UUID;
 
@@ -13,7 +14,7 @@ public class TempFileService {
             Files.writeString(Path.of(filePath), content);
             return filePath;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to create temp file", e);
+            throw new RuntimeException("Loi tao file ", e);
         }
     }
 
@@ -24,12 +25,25 @@ public class TempFileService {
             Files.createDirectories(Path.of(dir));
             return dir;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to create temp directory", e);
+            throw new RuntimeException("Loi xoa file", e);
         }
 
     }
 
-    public static void deleteTempDir(String dir) throws IOException {
-
+    public static void deleteTempDir(String dir) {
+        Path path = Path.of(dir);
+        try {
+            Files.walk(path)
+                    .sorted(Comparator.reverseOrder())
+                    .forEach(p -> {
+                        try {
+                            Files.delete(p);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
