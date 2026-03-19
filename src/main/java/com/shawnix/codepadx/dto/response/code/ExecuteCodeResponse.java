@@ -1,4 +1,4 @@
-package com.shawnix.codepadx.dto.request.code;
+package com.shawnix.codepadx.dto.response.code;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExecuteCodeRequest {
+public class ExecuteCodeResponse {
     String sourceCode;
     String input;
     int languageId;
+    String stdout;
+    String stderr;
 }
