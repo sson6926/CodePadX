@@ -82,4 +82,18 @@ public class CodeService {
         code.setLanguage(language);
         codeRepository.save(code);
     }
+
+    public CodeResponse getCodeById(Long id) {
+        var code = codeRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.CODE_NOT_FOUND));
+        return CodeResponse.builder()
+                .id(code.getId())
+                .title(code.getTitle())
+                .sourceCode(code.getSourceCode())
+                .input(code.getInput())
+                .languageId(code.getLanguage().getId())
+                .userId(code.getUser().getId())
+                .createdAt(code.getCreatedAt())
+                .updatedAt(code.getUpdatedAt())
+                .build();
+    }
 }

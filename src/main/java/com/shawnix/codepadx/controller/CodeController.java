@@ -46,6 +46,15 @@ public class CodeController {
                 .build();
     }
 
+    @GetMapping("/{id}")
+    ApiResponse getCodeById(@PathVariable Long id) {
+        codeService.getCodeById(id);
+        return ApiResponse.builder()
+                .message("Get code by id ok")
+                .data(codeService.getCodeById(id))
+                .build();
+    }
+
     @PutMapping("/{id}")
     ApiResponse updateCode(@Valid @RequestBody UpdateCodeRequest request, @PathVariable Long id) {
         codeService.updateCode(id, request);
