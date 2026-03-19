@@ -2,19 +2,27 @@ package com.shawnix.codepadx.entity;
 
 import com.shawnix.codepadx.entity.enums.Visibility;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
 
+@Data
+@Builder
 @Entity
 @Table(name = "codes")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Code {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    @ColumnDefault("Untitled")
+    @ColumnDefault("'Untitled'")
     private String title;
 
     @Lob
