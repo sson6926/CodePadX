@@ -57,11 +57,10 @@ public class CodeController {
 
     @PutMapping("/{id}")
     ApiResponse updateCode(@Valid @RequestBody UpdateCodeRequest request, @PathVariable Long id) {
-        codeService.updateCode(id, request);
         return ApiResponse.builder()
                 .message("Update code ok")
+                .data(codeService.updateCode(id, request))
                 .build();
     }
-
 
 }

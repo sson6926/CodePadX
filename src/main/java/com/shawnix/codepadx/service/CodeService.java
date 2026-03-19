@@ -5,6 +5,7 @@ import com.shawnix.codepadx.dto.request.code.SaveCodeRequest;
 import com.shawnix.codepadx.dto.request.code.UpdateCodeRequest;
 import com.shawnix.codepadx.dto.response.code.CodeResponse;
 import com.shawnix.codepadx.dto.response.code.SaveCodeResponse;
+import com.shawnix.codepadx.dto.response.code.UpdateCodeResponse;
 import com.shawnix.codepadx.entity.Code;
 import com.shawnix.codepadx.entity.enums.Visibility;
 import com.shawnix.codepadx.exception.AppException;
@@ -73,14 +74,25 @@ public class CodeService {
                 .build()).toList();
     }
 
-    public void updateCode(Long id, UpdateCodeRequest request) {
+    public UpdateCodeResponse updateCode(Long id, UpdateCodeRequest request) {
         var code = codeRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.CODE_NOT_FOUND));
         var language = languageRepository.findById(request.getLanguageId()).orElseThrow(() -> new AppException(ErrorCode.LANGUAGE_NOT_FOUND));
         code.setTitle(request.getTitle());
         code.setSourceCode(request.getSourceCode());
         code.setInput(request.getInput());
         code.setLanguage(language);
-        codeRepository.save(code);
+        var updatedCode = codeRepository.save(code);
+        return UpdateCodeResponse.builder()
+                .id(updatedCode.getId())
+                .title(updatedCode.getTitle())
+                .sourceCode(updatedCode.getSourceCode())
+                .input(updatedCode.getInput())
+                .languageId(updatedCode.getLanguage().getId())
+                .userId(updatedCode.getUser().getId())
+                .createdAt(updatedCode.getCreatedAt())
+                .updatedAt(updatedCode.getUpdatedAt())
+                .build();
+
     }
 
     public CodeResponse getCodeById(Long id) {
