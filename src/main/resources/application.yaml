@@ -17,3 +17,6 @@ spring:
     base-line-on-migrate: true
 server:
   port: 8080
+jwt:
+  secret: bXlzZWNyZXRrZXlteXNlY3JldGtleW15c2VjcmV0a2V5MTIz
+  expiration: 3600000
