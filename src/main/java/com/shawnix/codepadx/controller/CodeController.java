@@ -7,6 +7,7 @@ import com.shawnix.codepadx.dto.response.code.CodeResponse;
 import com.shawnix.codepadx.dto.response.code.SaveCodeResponse;
 import com.shawnix.codepadx.service.CodeService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,6 +39,7 @@ public class CodeController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     ApiResponse getAllCodes() {
         codeService.getAllCodes();
         return ApiResponse.builder()
