@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Loi JWT Authentication Filter");
+            SecurityContextHolder.clearContext();
         }
         filterChain.doFilter(request, response);
     }
