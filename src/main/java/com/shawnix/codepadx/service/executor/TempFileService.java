@@ -20,14 +20,13 @@ public class TempFileService {
 
     public static String createTempDir() {
         try {
-            String baseDir = "/tmp";
+            Path baseDir = Path.of(System.getProperty("user.home"));
             String dir = baseDir + "/code-exec/" + UUID.randomUUID();
             Files.createDirectories(Path.of(dir));
             return dir;
         } catch (IOException e) {
             throw new RuntimeException("Loi xoa file", e);
         }
-
     }
 
     public static void deleteTempDir(String dir) {

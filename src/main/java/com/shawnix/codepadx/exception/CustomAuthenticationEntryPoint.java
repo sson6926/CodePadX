@@ -21,8 +21,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         ApiResponse<String> body = ApiResponse.<String>builder()
                 .code(401)
-                .message("Unauthorized")
-                .data("Missing or invalid token")
+                .message("Missing or invalid token")
+                .data(null)
                 .build();
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

@@ -3,20 +3,35 @@ package com.shawnix.codepadx.exception;
 import com.shawnix.codepadx.dto.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(exception = {BadCredentialsException.class, AuthenticationException.class})
+    ResponseEntity<ApiResponse> handleAuthenticationException(AuthenticationException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse
+                        .builder()
+                        .code(HttpStatus.UNAUTHORIZED.value())
+                        .message("Email or password is incorrect")
+                        .data(null)
+                        .build()
+                );
+    }
+
     @ExceptionHandler(exception = RuntimeException.class)
     ResponseEntity<ApiResponse> handleRuntimeException(RuntimeException exception) {
+        String message = exception.getMessage() == null ? "Internal server error" : exception.getMessage();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse
                         .builder()
                         .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                        .message("Internal server error")
-                        .data(exception.getMessage())
+                        .message(message)
+                        .data(null)
                         .build()
                 );
     }
@@ -31,8 +46,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(
                 ApiResponse.builder()
                         .code(status.value())
-                        .message(status.getReasonPhrase())
-                        .data(exception.getErrorCode().getMessage())
+                        .message(exception.getErrorCode().getMessage())
+                        .data(null)
                         .build()
         );
 
@@ -47,8 +62,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(
                 ApiResponse.builder()
                         .code(HttpStatus.BAD_REQUEST.value())
-                        .message(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                        .data(errorMessage)
+                        .message(errorMessage)
+                        .data(null)
                         .build()
         );
     }

@@ -1,12 +1,16 @@
 package com.shawnix.codepadx.service;
 
 
+import com.shawnix.codepadx.dto.request.code.ExecuteCodeRequest;
 import com.shawnix.codepadx.dto.request.code.SaveCodeRequest;
 import com.shawnix.codepadx.dto.request.code.UpdateCodeRequest;
+import com.shawnix.codepadx.dto.response.PaginationResponse;
 import com.shawnix.codepadx.dto.response.code.CodeResponse;
+import com.shawnix.codepadx.dto.response.code.ExecuteCodeResponse;
 import com.shawnix.codepadx.dto.response.code.SaveCodeResponse;
 import com.shawnix.codepadx.dto.response.code.UpdateCodeResponse;
 import com.shawnix.codepadx.entity.Code;
+import com.shawnix.codepadx.entity.Language;
 import com.shawnix.codepadx.entity.User;
 import com.shawnix.codepadx.entity.enums.Role;
 import com.shawnix.codepadx.entity.enums.Visibility;
@@ -15,7 +19,13 @@ import com.shawnix.codepadx.exception.ErrorCode;
 import com.shawnix.codepadx.repository.CodeRepository;
 import com.shawnix.codepadx.repository.LanguageRepository;
 import com.shawnix.codepadx.repository.UserRepository;
+import com.shawnix.codepadx.service.executor.CodeExecutor;
+import com.shawnix.codepadx.service.executor.JavaExecutor;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -66,8 +76,18 @@ public class CodeService {
         codeRepository.delete(code);
     }
 
-    public List<CodeResponse> getAllCodes() {
-        return codeRepository.findAll().stream().map(code -> CodeResponse.builder()
+    public PaginationResponse<CodeResponse> getAllCodes(int page, int size) {
+        int normalizedPage = Math.max(page, 0);
+        int normalizedSize = Math.min(Math.max(size, 1), 100);
+        Pageable pageable = PageRequest.of(normalizedPage, normalizedSize, Sort.by(Sort.Direction.DESC, "updatedAt", "id"));
+
+        Page<Code> codes;
+        if(getCurrentUser().getRole() == Role.ADMIN) {
+            codes = codeRepository.findAll(pageable);
+        } else {
+            codes = codeRepository.findByUserId(getCurrentUser().getId(), pageable);
+        }
+        List<CodeResponse> items = codes.stream().map(code -> CodeResponse.builder()
                 .id(code.getId())
                 .title(code.getTitle())
                 .sourceCode(code.getSourceCode())
@@ -77,6 +97,14 @@ public class CodeService {
                 .createdAt(code.getCreatedAt())
                 .updatedAt(code.getUpdatedAt())
                 .build()).toList();
+
+        return PaginationResponse.<CodeResponse>builder()
+                .data(items)
+                .page(codes.getNumber())
+                .size(codes.getSize())
+                .totalElements(codes.getTotalElements())
+                .totalPages(codes.getTotalPages())
+                .build();
     }
 
     public UpdateCodeResponse updateCode(Long id, UpdateCodeRequest request) {
@@ -130,5 +158,15 @@ public class CodeService {
         if (!isOwner && !isAdmin) {
             throw new AppException(ErrorCode.PERMISSION_DENIED);
         }
+    }
+
+    public ExecuteCodeResponse executeCode(ExecuteCodeRequest request) {
+        Language language = languageRepository.findById(request.getLanguageId()).orElseThrow(() -> new AppException(ErrorCode.LANGUAGE_NOT_FOUND));
+        CodeExecutor executor = null;
+        switch (language.getCode()) {
+            case "java" -> executor = new JavaExecutor();
+            default -> throw new AppException(ErrorCode.CODE_NOT_FOUND);
+        }
+        return executor.execute(request.getSourceCode(), request.getInput());
     }
 }
