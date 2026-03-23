@@ -1,27 +1,55 @@
 package com.shawnix.codepadx.exception;
 
 import com.shawnix.codepadx.dto.response.ApiResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(exception = RuntimeException.class)
-    ResponseEntity<ApiResponse> handleRuntimeException(RuntimeException exception) {
-        return ResponseEntity.badRequest()
+    @ExceptionHandler(exception = {BadCredentialsException.class, AuthenticationException.class})
+    ResponseEntity<ApiResponse> handleAuthenticationException(AuthenticationException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ApiResponse
                         .builder()
-                        .code(400)
-                        .data(exception.getMessage())
+                        .code(HttpStatus.UNAUTHORIZED.value())
+                        .message("Email or password is incorrect")
+                        .data(null)
+                        .build()
+                );
+    }
+
+    @ExceptionHandler(exception = RuntimeException.class)
+    ResponseEntity<ApiResponse> handleRuntimeException(RuntimeException exception) {
+        String message = exception.getMessage() == null ? "Internal server error" : exception.getMessage();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse
+                        .builder()
+                        .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                        .message(message)
+                        .data(null)
                         .build()
                 );
     }
 
     @ExceptionHandler(exception = AppException.class)
     ResponseEntity<ApiResponse> handlingAppException(AppException exception) {
-        return ResponseEntity.badRequest().body(ApiResponse.builder().code(exception.getErrorCode().getCode()).data(exception.getErrorCode().getMessage()).build());
+        int statusCode = exception.getErrorCode().getCode();
+        HttpStatus status = HttpStatus.resolve(statusCode);
+        if (status == null) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                ApiResponse.builder()
+                        .code(status.value())
+                        .message(exception.getErrorCode().getMessage())
+                        .data(null)
+                        .build()
+        );
 
     }
 
@@ -31,6 +59,12 @@ public class GlobalExceptionHandler {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .findFirst()
                 .orElse("Validation error");
-        return ResponseEntity.badRequest().body(ApiResponse.builder().code(400).data(errorMessage).build());
+        return ResponseEntity.badRequest().body(
+                ApiResponse.builder()
+                        .code(HttpStatus.BAD_REQUEST.value())
+                        .message(errorMessage)
+                        .data(null)
+                        .build()
+        );
     }
 }

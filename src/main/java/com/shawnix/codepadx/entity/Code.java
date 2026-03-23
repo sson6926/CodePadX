@@ -52,7 +52,9 @@ public class Code {
 
     @PrePersist
     public void prePersist() {
+
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate

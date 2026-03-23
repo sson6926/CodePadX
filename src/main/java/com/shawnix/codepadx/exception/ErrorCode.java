@@ -7,9 +7,9 @@ public enum ErrorCode {
     USER_EXISTED(401, "User existed"),
     USER_NOT_FOUND(404, "User not found"),
     CODE_NOT_FOUND(404, "Code not found"),
-    LANGUAGE_NOT_FOUND(404, "Language not found");
-
-
+    LANGUAGE_NOT_FOUND(404, "Language not found"),
+    PERMISSION_DENIED(403, "Permission denied"),
+    CONTAINER_NOT_FOUND(404, "Container not found");
     private int code;
     private String message;
     ErrorCode(int code, String message) {

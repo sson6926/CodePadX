@@ -8,7 +8,7 @@ import java.util.Random;
 import java.util.UUID;
 
 public class TempFileService {
-    public static String createTempFile(String dir, String content, String fileName) {
+    public static String createTempFile(String dir, String fileName, String content) {
         try {
             String filePath = dir + "/" + fileName;
             Files.writeString(Path.of(filePath), content);
@@ -20,14 +20,13 @@ public class TempFileService {
 
     public static String createTempDir() {
         try {
-            String baseDir = "/tmp";
-            String dir = baseDir + "/code-run-" + UUID.randomUUID();
+            Path baseDir = Path.of(System.getProperty("user.home"));
+            String dir = baseDir + "/code-exec/" + UUID.randomUUID();
             Files.createDirectories(Path.of(dir));
             return dir;
         } catch (IOException e) {
             throw new RuntimeException("Loi xoa file", e);
         }
-
     }
 
     public static void deleteTempDir(String dir) {

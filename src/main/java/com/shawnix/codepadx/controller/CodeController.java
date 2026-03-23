@@ -1,15 +1,15 @@
 package com.shawnix.codepadx.controller;
 
+import com.shawnix.codepadx.dto.request.code.ExecuteCodeRequest;
 import com.shawnix.codepadx.dto.request.code.SaveCodeRequest;
 import com.shawnix.codepadx.dto.request.code.UpdateCodeRequest;
 import com.shawnix.codepadx.dto.response.ApiResponse;
+import com.shawnix.codepadx.dto.response.PaginationResponse;
 import com.shawnix.codepadx.dto.response.code.CodeResponse;
 import com.shawnix.codepadx.dto.response.code.SaveCodeResponse;
 import com.shawnix.codepadx.service.CodeService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/codes")
@@ -38,11 +38,12 @@ public class CodeController {
     }
 
     @GetMapping
-    ApiResponse getAllCodes() {
-        codeService.getAllCodes();
-        return ApiResponse.builder()
+    ApiResponse<PaginationResponse<CodeResponse>> getAllCodes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ApiResponse.<PaginationResponse<CodeResponse>>builder()
                 .message("Get all codes ok")
-                .data(codeService.getAllCodes())
+                .data(codeService.getAllCodes(page, size))
                 .build();
     }
 
@@ -60,6 +61,14 @@ public class CodeController {
         return ApiResponse.builder()
                 .message("Update code ok")
                 .data(codeService.updateCode(id, request))
+                .build();
+    }
+
+    @PostMapping("/execute")
+    ApiResponse executeCode(@RequestBody ExecuteCodeRequest request) {
+        return ApiResponse.builder()
+                .message("Execute code ok")
+                .data(codeService.executeCode(request))
                 .build();
     }
 
