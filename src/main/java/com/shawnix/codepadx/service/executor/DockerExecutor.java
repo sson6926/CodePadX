@@ -4,6 +4,7 @@ import com.shawnix.codepadx.dto.response.code.LocalExecuteResponse;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.concurrent.TimeUnit;
 
 public class DockerExecutor {
 
@@ -32,7 +33,7 @@ public class DockerExecutor {
                 result_stderr.append(line).append("\n");
             }
 
-            process.waitFor();
+            process.waitFor(5, TimeUnit.SECONDS);
 
             return LocalExecuteResponse.builder()
                     .stdout(result_stdout.toString().trim())
