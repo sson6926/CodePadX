@@ -5,10 +5,7 @@ import com.shawnix.codepadx.dto.request.code.ExecuteCodeRequest;
 import com.shawnix.codepadx.dto.request.code.SaveCodeRequest;
 import com.shawnix.codepadx.dto.request.code.UpdateCodeRequest;
 import com.shawnix.codepadx.dto.response.PaginationResponse;
-import com.shawnix.codepadx.dto.response.code.CodeResponse;
-import com.shawnix.codepadx.dto.response.code.ExecuteCodeResponse;
-import com.shawnix.codepadx.dto.response.code.SaveCodeResponse;
-import com.shawnix.codepadx.dto.response.code.UpdateCodeResponse;
+import com.shawnix.codepadx.dto.response.code.*;
 import com.shawnix.codepadx.entity.Code;
 import com.shawnix.codepadx.entity.Language;
 import com.shawnix.codepadx.entity.User;
@@ -149,6 +146,13 @@ public class CodeService {
             case "java" -> executor = new JavaExecutor();
             default -> throw new AppException(ErrorCode.CODE_NOT_FOUND);
         }
-        return executor.execute(request.getSourceCode(), request.getInput());
+        LocalExecuteResponse localExecuteResponse = executor.execute(request.getSourceCode(), request.getInput());
+        return ExecuteCodeResponse.builder()
+                .sourceCode(request.getSourceCode())
+                .input(request.getInput())
+                .languageId(request.getLanguageId())
+                .stdout(localExecuteResponse.getStdout())
+                .stderr(localExecuteResponse.getStderr())
+                .build();
     }
 }
