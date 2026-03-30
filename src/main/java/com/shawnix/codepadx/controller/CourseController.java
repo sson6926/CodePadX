@@ -43,7 +43,7 @@ public class CourseController {
     }
 
     @GetMapping("/{id}/detail")
-    ApiResponse getCourseDetailById(@PathVariable Long id) {
+    ApiResponse<CourseDetailResponse> getCourseDetailById(@PathVariable Long id) {
         return ApiResponse.<CourseDetailResponse>builder()
                 .data(courseService.getCourseDetailById(id))
                 .message("Get course detail by id ok")
@@ -63,6 +63,15 @@ public class CourseController {
         courseService.deleteCourse(id);
         return ApiResponse.<Void>builder()
                 .message("Delete course ok")
+                .data(null)
+                .build();
+    }
+
+    @PostMapping("/{id}/enroll")
+    ApiResponse<Void> enrollCourse(@PathVariable Long id) {
+        courseService.enrollCourse(id);
+        return ApiResponse.<Void>builder()
+                .message("Enroll course ok")
                 .data(null)
                 .build();
     }

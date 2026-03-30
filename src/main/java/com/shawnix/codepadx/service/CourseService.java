@@ -7,11 +7,16 @@ import com.shawnix.codepadx.dto.response.course.CourseDetailResponse;
 import com.shawnix.codepadx.dto.response.course.CourseResponse;
 import com.shawnix.codepadx.entity.Chapter;
 import com.shawnix.codepadx.entity.Course;
+import com.shawnix.codepadx.entity.Enrollment;
+import com.shawnix.codepadx.entity.User;
 import com.shawnix.codepadx.entity.enums.CourseStatus;
 import com.shawnix.codepadx.exception.AppException;
 import com.shawnix.codepadx.exception.ErrorCode;
 import com.shawnix.codepadx.repository.CourseRepository;
+import com.shawnix.codepadx.repository.EnrollmentRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -19,10 +24,12 @@ import java.util.List;
 
 @Service
 public class CourseService {
-    private CourseRepository courseRepository;
+    private final CourseRepository courseRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
-    public CourseService(CourseRepository courseRepository) {
+    public CourseService(CourseRepository courseRepository, EnrollmentRepository enrollmentRepository) {
         this.courseRepository = courseRepository;
+        this.enrollmentRepository = enrollmentRepository;
     }
 
     public List<CourseResponse> getAllCourses() {
@@ -76,5 +83,29 @@ public class CourseService {
         courseRepository.delete(course);
     }
 
+    @Transactional
+    public void enrollCourse(Long id) {
+        User currentUser = getCurrentUser();
+        Course course = courseRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        if (course.getStatus() != CourseStatus.PUBLISHED) {
+            throw new AppException(ErrorCode.COURSE_NOT_PUBLISHED);
+        }
+        if (enrollmentRepository.existsByUserIdAndCourseId(currentUser.getId(), id)) {
+            throw new AppException(ErrorCode.COURSE_ALREADY_ENROLLED);
+        }
+        Enrollment enrollment = new Enrollment();
+        enrollment.setUser(currentUser);
+        enrollment.setCourse(course);
+        enrollmentRepository.save(enrollment);
+    }
+
+    private User getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !(auth.getPrincipal() instanceof User user)) {
+            throw new AppException(ErrorCode.PERMISSION_DENIED);
+        }
+        return user;
+    }
 
 }

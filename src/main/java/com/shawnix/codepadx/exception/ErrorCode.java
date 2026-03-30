@@ -8,6 +8,8 @@ public enum ErrorCode {
     USER_NOT_FOUND(404, "User not found"),
     CODE_NOT_FOUND(404, "Code not found"),
     COURSE_NOT_FOUND(404, "Course not found"),
+    COURSE_ALREADY_ENROLLED(400, "You already enrolled this course"),
+    COURSE_NOT_PUBLISHED(400, "Course is not published"),
     CHAPTER_NOT_FOUND(404, "Chapter not found"),
     LESSON_NOT_FOUND(404, "Lesson not found"),
     LANGUAGE_NOT_FOUND(404, "Language not found"),
