@@ -47,4 +47,9 @@ public class Course {
     public void preUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    public void addChapter(Chapter chapter) {
+        chapter.setCourse(this);
+        chapterList.add(chapter);
+    }
 }
