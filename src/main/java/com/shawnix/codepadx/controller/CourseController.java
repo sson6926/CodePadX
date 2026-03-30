@@ -3,6 +3,7 @@ package com.shawnix.codepadx.controller;
 import com.shawnix.codepadx.dto.request.course.CreateCourseRequest;
 import com.shawnix.codepadx.dto.request.course.UpdateCourseRequest;
 import com.shawnix.codepadx.dto.response.ApiResponse;
+import com.shawnix.codepadx.dto.response.course.CourseDetailResponse;
 import com.shawnix.codepadx.dto.response.course.CourseResponse;
 import com.shawnix.codepadx.service.CourseService;
 import jakarta.validation.Valid;
@@ -38,6 +39,14 @@ public class CourseController {
         return ApiResponse.<CourseResponse>builder()
                 .data(courseService.getCourseById(id))
                 .message("Get course by id ok")
+                .build();
+    }
+
+    @GetMapping("/{id}/detail")
+    ApiResponse getCourseDetailById(@PathVariable Long id) {
+        return ApiResponse.<CourseDetailResponse>builder()
+                .data(courseService.getCourseDetailById(id))
+                .message("Get course detail by id ok")
                 .build();
     }
 
