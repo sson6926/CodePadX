@@ -1,0 +1,3 @@
+ALTER TABLE codes
+    MODIFY COLUMN source_code TEXT NOT NULL,
+    MODIFY COLUMN input TEXT NULL;

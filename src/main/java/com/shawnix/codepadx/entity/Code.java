@@ -26,10 +26,11 @@ public class Code {
     private String title;
 
     @Lob
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String sourceCode;
 
     @Lob
+    @Column(columnDefinition = "TEXT")
     private String input;
 
     @Enumerated(EnumType.STRING)

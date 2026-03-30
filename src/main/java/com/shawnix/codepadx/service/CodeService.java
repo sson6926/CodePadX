@@ -144,7 +144,7 @@ public class CodeService {
         CodeExecutor executor = null;
         switch (language.getCode()) {
             case "java" -> executor = new JavaExecutor();
-            default -> throw new AppException(ErrorCode.CODE_NOT_FOUND);
+            default -> throw new AppException(ErrorCode.LANGUAGE_NOT_AVAILABLE);
         }
         LocalExecuteResponse localExecuteResponse = executor.execute(request.getSourceCode(), request.getInput());
         return ExecuteCodeResponse.builder()

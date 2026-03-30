@@ -11,6 +11,7 @@ import com.shawnix.codepadx.entity.enums.CourseStatus;
 import com.shawnix.codepadx.exception.AppException;
 import com.shawnix.codepadx.exception.ErrorCode;
 import com.shawnix.codepadx.repository.CourseRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -28,6 +29,7 @@ public class CourseService {
         return courseRepository.findAll().stream().map(c -> CourseResponse.toResponse(c)).toList();
     }
 
+    @Transactional
     public CourseDetailResponse getCourseDetailById(Long id) {
         Course course = courseRepository.findDetailById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
@@ -35,17 +37,8 @@ public class CourseService {
                 .sorted(Comparator.comparing(Chapter::getOrderIndex))
                 .map(ChapterResponse::toResponse)
                 .toList();
-        CourseDetailResponse response = CourseDetailResponse.builder()
-                .id(course.getId())
-                .title(course.getTitle())
-                .description(course.getDescription())
-                .price(course.getPrice())
-                .thumbnailUrl(course.getThumbnailUrl())
-                .status(course.getStatus())
-                .chapters(chapters)
-                .createdAt(course.getCreatedAt())
-                .updatedAt(course.getUpdatedAt())
-                .build();
+        CourseDetailResponse response = CourseDetailResponse.toResponse(course);
+        response.setChapters(chapters);
         return response;
     }
 
