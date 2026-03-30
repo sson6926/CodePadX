@@ -84,16 +84,7 @@ public class CodeService {
         } else {
             codes = codeRepository.findByUserId(getCurrentUser().getId(), pageable);
         }
-        List<CodeResponse> items = codes.stream().map(code -> CodeResponse.builder()
-                .id(code.getId())
-                .title(code.getTitle())
-                .sourceCode(code.getSourceCode())
-                .input(code.getInput())
-                .languageId(code.getLanguage().getId())
-                .userId(code.getUser().getId())
-                .createdAt(code.getCreatedAt())
-                .updatedAt(code.getUpdatedAt())
-                .build()).toList();
+        List<CodeResponse> items = codes.stream().map(code -> CodeResponse.toResponse(code)).toList();
 
         return PaginationResponse.<CodeResponse>builder()
                 .data(items)
@@ -128,16 +119,7 @@ public class CodeService {
     public CodeResponse getCodeById(Long id) {
         var code = codeRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.CODE_NOT_FOUND));
         validateOwnerOrAdmin(code);
-        return CodeResponse.builder()
-                .id(code.getId())
-                .title(code.getTitle())
-                .sourceCode(code.getSourceCode())
-                .input(code.getInput())
-                .languageId(code.getLanguage().getId())
-                .userId(code.getUser().getId())
-                .createdAt(code.getCreatedAt())
-                .updatedAt(code.getUpdatedAt())
-                .build();
+        return CodeResponse.toResponse(code);
     }
 
     private User getCurrentUser() {
