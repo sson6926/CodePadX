@@ -94,7 +94,7 @@ public class CodeService {
                 .totalPages(codes.getTotalPages())
                 .build();
     }
-
+    @Transactional
     public UpdateCodeResponse updateCode(Long id, UpdateCodeRequest request) {
         var code = codeRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.CODE_NOT_FOUND));
         validateOwnerOrAdmin(code);
@@ -104,16 +104,7 @@ public class CodeService {
         code.setInput(request.getInput());
         code.setLanguage(language);
         var updatedCode = codeRepository.save(code);
-        return UpdateCodeResponse.builder()
-                .id(updatedCode.getId())
-                .title(updatedCode.getTitle())
-                .sourceCode(updatedCode.getSourceCode())
-                .input(updatedCode.getInput())
-                .languageId(updatedCode.getLanguage().getId())
-                .userId(updatedCode.getUser().getId())
-                .createdAt(updatedCode.getCreatedAt())
-                .updatedAt(updatedCode.getUpdatedAt())
-                .build();
+        return UpdateCodeResponse.toResponse(updatedCode);
     }
 
     public CodeResponse getCodeById(Long id) {
