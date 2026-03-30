@@ -2,6 +2,7 @@ package com.shawnix.codepadx.service;
 
 import com.shawnix.codepadx.dto.request.course.CreateCourseRequest;
 import com.shawnix.codepadx.dto.request.course.UpdateCourseRequest;
+import com.shawnix.codepadx.dto.response.PaginationResponse;
 import com.shawnix.codepadx.dto.response.chapter.ChapterResponse;
 import com.shawnix.codepadx.dto.response.course.CourseDetailResponse;
 import com.shawnix.codepadx.dto.response.course.CourseResponse;
@@ -14,7 +15,13 @@ import com.shawnix.codepadx.exception.AppException;
 import com.shawnix.codepadx.exception.ErrorCode;
 import com.shawnix.codepadx.repository.CourseRepository;
 import com.shawnix.codepadx.repository.EnrollmentRepository;
+import com.shawnix.codepadx.specification.CourseSpecification;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -83,6 +90,30 @@ public class CourseService {
         courseRepository.delete(course);
     }
 
+    public PaginationResponse<CourseResponse> searchCourses(
+            String keyword,
+            CourseStatus status,
+            Double minPrice,
+            Double maxPrice,
+            int page,
+            int size) {
+        int normalizedPage = Math.max(page, 0);
+        int normalizedSize = Math.min(Math.max(size, 1), 100);
+        Pageable pageable = PageRequest.of(
+                normalizedPage,
+                normalizedSize,
+                Sort.by(Sort.Direction.DESC, "createdAt", "id"));
+        Specification<Course> spec = CourseSpecification.build(keyword, status, minPrice, maxPrice);
+        Page<Course> result = courseRepository.findAll(spec, pageable);
+        return PaginationResponse.<CourseResponse>builder()
+                .data(result.getContent().stream().map(CourseResponse::toResponse).toList())
+                .page(result.getNumber())
+                .size(result.getSize())
+                .totalElements(result.getTotalElements())
+                .totalPages(result.getTotalPages())
+                .build();
+    }
+
     @Transactional
     public void enrollCourse(Long id) {
         User currentUser = getCurrentUser();
@@ -107,5 +138,7 @@ public class CourseService {
         }
         return user;
     }
+
+
 
 }
