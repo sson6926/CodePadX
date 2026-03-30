@@ -2,7 +2,10 @@ package com.shawnix.codepadx.service;
 
 import com.shawnix.codepadx.dto.request.course.CreateCourseRequest;
 import com.shawnix.codepadx.dto.request.course.UpdateCourseRequest;
+import com.shawnix.codepadx.dto.response.chapter.ChapterResponse;
+import com.shawnix.codepadx.dto.response.course.CourseDetailResponse;
 import com.shawnix.codepadx.dto.response.course.CourseResponse;
+import com.shawnix.codepadx.entity.Chapter;
 import com.shawnix.codepadx.entity.Course;
 import com.shawnix.codepadx.entity.enums.CourseStatus;
 import com.shawnix.codepadx.exception.AppException;
@@ -10,6 +13,7 @@ import com.shawnix.codepadx.exception.ErrorCode;
 import com.shawnix.codepadx.repository.CourseRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -22,6 +26,27 @@ public class CourseService {
 
     public List<CourseResponse> getAllCourses() {
         return courseRepository.findAll().stream().map(c -> CourseResponse.toResponse(c)).toList();
+    }
+
+    public CourseDetailResponse getCourseDetailById(Long id) {
+        Course course = courseRepository.findDetailById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        List<ChapterResponse> chapters = course.getChapterList().stream()
+                .sorted(Comparator.comparing(Chapter::getOrderIndex))
+                .map(ChapterResponse::toResponse)
+                .toList();
+        CourseDetailResponse response = CourseDetailResponse.builder()
+                .id(course.getId())
+                .title(course.getTitle())
+                .description(course.getDescription())
+                .price(course.getPrice())
+                .thumbnailUrl(course.getThumbnailUrl())
+                .status(course.getStatus())
+                .chapters(chapters)
+                .createdAt(course.getCreatedAt())
+                .updatedAt(course.getUpdatedAt())
+                .build();
+        return response;
     }
 
     public CourseResponse createCourse(CreateCourseRequest request) {

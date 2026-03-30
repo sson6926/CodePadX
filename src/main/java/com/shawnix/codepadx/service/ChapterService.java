@@ -24,17 +24,20 @@ public class ChapterService {
     }
 
     public ChapterResponse createChapter(Long courseId, CreateChapterRequest request) {
-        Course course = findCourseOrThrow(courseId);
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         Chapter chapter = new Chapter();
-        chapter.setCourse(course);
         chapter.setTitle(request.getTitle());
         chapter.setDescription(request.getDescription());
         chapter.setOrderIndex(request.getOrderIndex());
-        return ChapterResponse.toResponse(chapterRepository.save(chapter));
+        course.addChapter(chapter);
+        courseRepository.save(course);
+        return ChapterResponse.toResponse(chapter);
     }
 
     public List<ChapterResponse> getAllByCourse(Long courseId) {
-        findCourseOrThrow(courseId);
+        courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         return chapterRepository.findByCourseIdOrderByOrderIndexAsc(courseId)
                 .stream()
                 .map(ChapterResponse::toResponse)

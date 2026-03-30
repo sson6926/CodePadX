@@ -36,6 +36,7 @@ public class Course {
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     List<Chapter> chapterList;
+
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
@@ -45,5 +46,10 @@ public class Course {
     @PreUpdate
     public void preUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    public void addChapter(Chapter chapter) {
+        chapter.setCourse(this);
+        chapterList.add(chapter);
     }
 }

@@ -19,7 +19,7 @@ public class Chapter {
     private String description;
     private Integer orderIndex;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
     private Course course;
 
