@@ -33,4 +33,7 @@ public class Lesson {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    @Version
+    private Long version;
 }

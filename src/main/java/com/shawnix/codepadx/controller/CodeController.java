@@ -5,8 +5,12 @@ import com.shawnix.codepadx.dto.request.code.SaveCodeRequest;
 import com.shawnix.codepadx.dto.request.code.UpdateCodeRequest;
 import com.shawnix.codepadx.dto.response.ApiResponse;
 import com.shawnix.codepadx.dto.response.PaginationResponse;
+import com.shawnix.codepadx.dto.response.code.CodeDetailResponse;
 import com.shawnix.codepadx.dto.response.code.CodeResponse;
+import com.shawnix.codepadx.dto.response.code.ExecuteCodeResponse;
 import com.shawnix.codepadx.dto.response.code.SaveCodeResponse;
+import com.shawnix.codepadx.dto.response.code.UpdateCodeResponse;
+import com.shawnix.codepadx.entity.enums.Visibility;
 import com.shawnix.codepadx.service.CodeService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -30,43 +34,46 @@ public class CodeController {
     }
 
     @DeleteMapping("/{id}")
-    ApiResponse deleteCode(@PathVariable Long id) {
+    ApiResponse<Void> deleteCode(@PathVariable Long id) {
         codeService.deleteCode(id);
-        return ApiResponse.builder()
+        return ApiResponse.<Void>builder()
                 .message("Delete code ok")
                 .build();
     }
 
     @GetMapping
-    ApiResponse<PaginationResponse<CodeResponse>> getAllCodes(
+    ApiResponse<PaginationResponse<CodeDetailResponse>> getAllCodes(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return ApiResponse.<PaginationResponse<CodeResponse>>builder()
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer languageId,
+            @RequestParam(required = false) Visibility visibility,
+            @RequestParam(required = false) Long userId) {
+        return ApiResponse.<PaginationResponse<CodeDetailResponse>>builder()
                 .message("Get all codes ok")
-                .data(codeService.getAllCodes(page, size))
+                .data(codeService.getAllCodes(page, size, keyword, languageId, visibility, userId))
                 .build();
     }
 
     @GetMapping("/{id}")
-    ApiResponse getCodeById(@PathVariable Long id) {
-        codeService.getCodeById(id);
-        return ApiResponse.builder()
+    ApiResponse<CodeResponse> getCodeById(@PathVariable Long id) {
+        return ApiResponse.<CodeResponse>builder()
                 .message("Get code by id ok")
                 .data(codeService.getCodeById(id))
                 .build();
     }
 
     @PutMapping("/{id}")
-    ApiResponse updateCode(@Valid @RequestBody UpdateCodeRequest request, @PathVariable Long id) {
-        return ApiResponse.builder()
+    ApiResponse<UpdateCodeResponse> updateCode(@Valid @RequestBody UpdateCodeRequest request, @PathVariable Long id) {
+        return ApiResponse.<UpdateCodeResponse>builder()
                 .message("Update code ok")
                 .data(codeService.updateCode(id, request))
                 .build();
     }
 
     @PostMapping("/execute")
-    ApiResponse executeCode(@RequestBody ExecuteCodeRequest request) {
-        return ApiResponse.builder()
+    ApiResponse<ExecuteCodeResponse> executeCode(@RequestBody ExecuteCodeRequest request) {
+        return ApiResponse.<ExecuteCodeResponse>builder()
                 .message("Execute code ok")
                 .data(codeService.executeCode(request))
                 .build();

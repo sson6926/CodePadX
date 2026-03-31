@@ -16,7 +16,8 @@ public enum ErrorCode {
     PERMISSION_DENIED(403, "Permission denied"),
     CONTAINER_NOT_FOUND(404, "Container not found"),
     LANGUAGE_NOT_SUPPORTED(400, "Language not supported"),
-    LANGUAGE_NOT_AVAILABLE(404, "Language not available"),;
+    LANGUAGE_NOT_AVAILABLE(404, "Language not available"),
+    CONCURRENCY_CONFLICT(409, "Concurrency conflict, please reload page"),;
     private int code;
     private String message;
     ErrorCode(int code, String message) {
