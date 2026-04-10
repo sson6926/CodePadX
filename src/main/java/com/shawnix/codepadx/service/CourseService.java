@@ -17,6 +17,7 @@ import com.shawnix.codepadx.repository.CourseRepository;
 import com.shawnix.codepadx.repository.EnrollmentRepository;
 import com.shawnix.codepadx.specification.CourseSpecification;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,14 +31,10 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CourseService {
     private final CourseRepository courseRepository;
     private final EnrollmentRepository enrollmentRepository;
-
-    public CourseService(CourseRepository courseRepository, EnrollmentRepository enrollmentRepository) {
-        this.courseRepository = courseRepository;
-        this.enrollmentRepository = enrollmentRepository;
-    }
 
     public List<CourseResponse> getAllCourses() {
         return courseRepository.findAll().stream().map(c -> CourseResponse.toResponse(c)).toList();

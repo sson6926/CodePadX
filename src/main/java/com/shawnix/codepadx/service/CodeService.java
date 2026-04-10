@@ -19,6 +19,7 @@ import com.shawnix.codepadx.specification.CodeSpecification;
 import com.shawnix.codepadx.service.executor.CodeExecutor;
 import com.shawnix.codepadx.service.executor.JavaExecutor;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,14 +32,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CodeService {
     private CodeRepository codeRepository;
     private LanguageRepository languageRepository;
-
-    public CodeService(CodeRepository codeRepository, LanguageRepository languageRepository) {
-        this.codeRepository = codeRepository;
-        this.languageRepository = languageRepository;
-    }
 
     @Transactional
     public SaveCodeResponse saveCode(SaveCodeRequest request) {

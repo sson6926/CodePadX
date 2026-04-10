@@ -13,17 +13,14 @@ import com.shawnix.codepadx.dto.response.code.UpdateCodeResponse;
 import com.shawnix.codepadx.entity.enums.Visibility;
 import com.shawnix.codepadx.service.CodeService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/codes")
+@RequiredArgsConstructor
 public class CodeController {
     private CodeService codeService;
-
-    public CodeController(CodeService codeService) {
-        this.codeService = codeService;
-    }
-
 
     @PostMapping
     ApiResponse<SaveCodeResponse> saveCode(@Valid @RequestBody SaveCodeRequest request) {

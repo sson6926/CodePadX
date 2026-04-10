@@ -6,18 +6,16 @@ import com.shawnix.codepadx.dto.response.ApiResponse;
 import com.shawnix.codepadx.dto.response.user.CreateUserResponse;
 import com.shawnix.codepadx.service.UserService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
-    private UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    private final UserService userService;
 
     @PostMapping
     ApiResponse<CreateUserResponse> createUser(@RequestBody @Valid CreateUserRequest request) {

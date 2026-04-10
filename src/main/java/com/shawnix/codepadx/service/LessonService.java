@@ -11,20 +11,18 @@ import com.shawnix.codepadx.repository.ChapterRepository;
 import com.shawnix.codepadx.repository.LessonRepository;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class LessonService {
     private final LessonRepository lessonRepository;
     private final ChapterRepository chapterRepository;
 
-    public LessonService(LessonRepository lessonRepository, ChapterRepository chapterRepository) {
-        this.lessonRepository = lessonRepository;
-        this.chapterRepository = chapterRepository;
-    }
 
     public LessonResponse createLesson(Long courseId, Long chapterId, CreateLessonRequest request) {
         Chapter chapter = findChapterOrThrow(courseId, chapterId);
