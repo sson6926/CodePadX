@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -23,6 +24,8 @@ public class Chapter {
     @JoinColumn(name = "course_id")
     private Course course;
 
+    @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Lesson> lessons;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

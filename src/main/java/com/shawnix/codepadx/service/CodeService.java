@@ -15,14 +15,16 @@ import com.shawnix.codepadx.exception.AppException;
 import com.shawnix.codepadx.exception.ErrorCode;
 import com.shawnix.codepadx.repository.CodeRepository;
 import com.shawnix.codepadx.repository.LanguageRepository;
-import com.shawnix.codepadx.repository.UserRepository;
+import com.shawnix.codepadx.specification.CodeSpecification;
 import com.shawnix.codepadx.service.executor.CodeExecutor;
 import com.shawnix.codepadx.service.executor.JavaExecutor;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,23 +32,15 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CodeService {
     private CodeRepository codeRepository;
     private LanguageRepository languageRepository;
-    private UserRepository userRepository;
-
-    public CodeService(CodeRepository codeRepository, LanguageRepository languageRepository, UserRepository userRepository) {
-        this.codeRepository = codeRepository;
-        this.languageRepository = languageRepository;
-        this.userRepository = userRepository;
-    }
 
     @Transactional
     public SaveCodeResponse saveCode(SaveCodeRequest request) {
         var language = languageRepository.findById(request.getLanguageId()).orElseThrow(() -> new AppException(ErrorCode.LANGUAGE_NOT_FOUND));
         var user = getCurrentUser();
-        System.out.println(language.getExampleCode());
-        System.out.println(request.getSourceCode());
         var savedCode = codeRepository.save(Code.builder()
                         .sourceCode(request.getSourceCode())
                         .language(language)
@@ -73,20 +67,24 @@ public class CodeService {
         codeRepository.delete(code);
     }
 
-    public PaginationResponse<CodeResponse> getAllCodes(int page, int size) {
+    public PaginationResponse<CodeDetailResponse> getAllCodes(
+            int page,
+            int size,
+            String keyword,
+            Integer languageId,
+            Visibility visibility,
+            Long userId) {
         int normalizedPage = Math.max(page, 0);
         int normalizedSize = Math.min(Math.max(size, 1), 100);
         Pageable pageable = PageRequest.of(normalizedPage, normalizedSize, Sort.by(Sort.Direction.DESC, "updatedAt", "id"));
 
-        Page<Code> codes;
-        if(getCurrentUser().getRole() == Role.ADMIN) {
-            codes = codeRepository.findAll(pageable);
-        } else {
-            codes = codeRepository.findByUserId(getCurrentUser().getId(), pageable);
-        }
-        List<CodeResponse> items = codes.stream().map(code -> CodeResponse.toResponse(code)).toList();
+        User currentUser = getCurrentUser();
+        Long effectiveUserId = currentUser.getRole() == Role.ADMIN ? userId : currentUser.getId();
+        Specification<Code> spec = CodeSpecification.build(keyword, languageId, visibility, effectiveUserId);
+        Page<Code> codes = codeRepository.findAll(spec, pageable);
+        List<CodeDetailResponse> items = codes.stream().map(code -> CodeDetailResponse.toResponse(code)).toList();
 
-        return PaginationResponse.<CodeResponse>builder()
+        return PaginationResponse.<CodeDetailResponse>builder()
                 .data(items)
                 .page(codes.getNumber())
                 .size(codes.getSize())
@@ -144,7 +142,7 @@ public class CodeService {
         CodeExecutor executor = null;
         switch (language.getCode()) {
             case "java" -> executor = new JavaExecutor();
-            default -> throw new AppException(ErrorCode.CODE_NOT_FOUND);
+            default -> throw new AppException(ErrorCode.LANGUAGE_NOT_AVAILABLE);
         }
         LocalExecuteResponse localExecuteResponse = executor.execute(request.getSourceCode(), request.getInput());
         return ExecuteCodeResponse.builder()

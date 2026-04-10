@@ -9,19 +9,17 @@ import com.shawnix.codepadx.exception.AppException;
 import com.shawnix.codepadx.exception.ErrorCode;
 import com.shawnix.codepadx.repository.ChapterRepository;
 import com.shawnix.codepadx.repository.CourseRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ChapterService {
     private final ChapterRepository chapterRepository;
     private final CourseRepository courseRepository;
 
-    public ChapterService(ChapterRepository chapterRepository, CourseRepository courseRepository) {
-        this.chapterRepository = chapterRepository;
-        this.courseRepository = courseRepository;
-    }
 
     public ChapterResponse createChapter(Long courseId, CreateChapterRequest request) {
         Course course = courseRepository.findById(courseId)

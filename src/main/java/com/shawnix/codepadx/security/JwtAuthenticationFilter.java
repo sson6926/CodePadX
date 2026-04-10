@@ -32,10 +32,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         String jwt = authHeader.substring(7);
         try {
-            Long userId = jwtUtil.extractUserId(jwt);
+            Long userId = jwtUtil.extractUserIdWithAccessToken(jwt);
             if(userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = customUserDetailsService.loadUserByUserId(userId);
-                if(jwtUtil.validateToken(jwt, userDetails)) {
+                if(jwtUtil.validateAccesTokenToken(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,

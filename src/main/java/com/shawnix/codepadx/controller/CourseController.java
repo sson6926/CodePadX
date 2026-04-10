@@ -3,8 +3,10 @@ package com.shawnix.codepadx.controller;
 import com.shawnix.codepadx.dto.request.course.CreateCourseRequest;
 import com.shawnix.codepadx.dto.request.course.UpdateCourseRequest;
 import com.shawnix.codepadx.dto.response.ApiResponse;
+import com.shawnix.codepadx.dto.response.PaginationResponse;
 import com.shawnix.codepadx.dto.response.course.CourseDetailResponse;
 import com.shawnix.codepadx.dto.response.course.CourseResponse;
+import com.shawnix.codepadx.entity.enums.CourseStatus;
 import com.shawnix.codepadx.service.CourseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,20 @@ public class CourseController {
                 .message("Get all courses ok")
                 .build();
     }
+    @GetMapping("/search")
+    ApiResponse<PaginationResponse<CourseResponse>> searchCourses(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) CourseStatus status,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ApiResponse.<PaginationResponse<CourseResponse>>builder()
+                .data(courseService.searchCourses(keyword, status, minPrice, maxPrice, page, size))
+                .message("Search courses ok")
+                .build();
+    }
+
 
     @GetMapping("/{id}")
     ApiResponse<CourseResponse> getCourseById(@PathVariable Long id) {
@@ -43,7 +59,7 @@ public class CourseController {
     }
 
     @GetMapping("/{id}/detail")
-    ApiResponse getCourseDetailById(@PathVariable Long id) {
+    ApiResponse<CourseDetailResponse> getCourseDetailById(@PathVariable Long id) {
         return ApiResponse.<CourseDetailResponse>builder()
                 .data(courseService.getCourseDetailById(id))
                 .message("Get course detail by id ok")
@@ -66,4 +82,14 @@ public class CourseController {
                 .data(null)
                 .build();
     }
+
+    @PostMapping("/{id}/enroll")
+    ApiResponse<Void> enrollCourse(@PathVariable Long id) {
+        courseService.enrollCourse(id);
+        return ApiResponse.<Void>builder()
+                .message("Enroll course ok")
+                .data(null)
+                .build();
+    }
+
 }

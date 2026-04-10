@@ -1,6 +1,7 @@
 package com.shawnix.codepadx.dto.response.course;
 
 import com.shawnix.codepadx.dto.response.chapter.ChapterResponse;
+import com.shawnix.codepadx.entity.Course;
 import com.shawnix.codepadx.entity.enums.CourseStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,4 +25,18 @@ public class CourseDetailResponse {
     private List<ChapterResponse> chapters;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public static CourseDetailResponse toResponse(Course course) {
+        return CourseDetailResponse.builder()
+                .id(course.getId())
+                .title(course.getTitle())
+                .description(course.getDescription())
+                .price(course.getPrice())
+                .thumbnailUrl(course.getThumbnailUrl())
+                .status(course.getStatus())
+                .chapters(course.getChapterList().stream().map(ChapterResponse::toResponse).toList())
+                .createdAt(course.getCreatedAt())
+                .updatedAt(course.getUpdatedAt())
+                .build();
+    }
 }
