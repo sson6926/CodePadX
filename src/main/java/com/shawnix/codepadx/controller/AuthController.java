@@ -1,9 +1,11 @@
 package com.shawnix.codepadx.controller;
 
 import com.shawnix.codepadx.dto.request.auth.LoginRequest;
+import com.shawnix.codepadx.dto.request.auth.RefreshRequest;
 import com.shawnix.codepadx.dto.request.user.CreateUserRequest;
 import com.shawnix.codepadx.dto.response.ApiResponse;
 import com.shawnix.codepadx.dto.response.auth.LoginResponse;
+import com.shawnix.codepadx.dto.response.auth.RefreshResponse;
 import com.shawnix.codepadx.dto.response.user.CreateUserResponse;
 import com.shawnix.codepadx.entity.User;
 import com.shawnix.codepadx.security.JwtUtil;
@@ -43,7 +45,12 @@ public class AuthController {
                 .build();
     }
 
-
-
-
+    @PostMapping("/refresh")
+    public ApiResponse<RefreshResponse> refresh(@RequestBody RefreshRequest request) {
+        System.out.println(request.getRefreshToken());
+        return ApiResponse.<RefreshResponse>builder()
+                .message("Granted new refresh token and access token")
+                .data(authService.refresh(request))
+                .build();
+    }
 }

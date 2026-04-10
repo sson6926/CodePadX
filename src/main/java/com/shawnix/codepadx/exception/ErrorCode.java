@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum ErrorCode {
     USER_EXISTED(401, "User existed"),
     USER_NOT_FOUND(404, "User not found"),
+    INVALID_REFRESH_TOKEN(401, "Invalid refresh token"),
     CODE_NOT_FOUND(404, "Code not found"),
     COURSE_NOT_FOUND(404, "Course not found"),
     COURSE_ALREADY_ENROLLED(400, "You already enrolled this course"),

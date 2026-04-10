@@ -62,15 +62,26 @@ public class JwtUtil {
                 .signWith(getRefreshTokenSigningKey())
                 .compact();
     }
-    public Long extractUserId(String token) {
+    public Long extractUserIdWithAccessToken(String accessToken) {
         Object userId = Jwts.parser()
                 .verifyWith(getAccesTokenSigningKey())
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(accessToken)
                 .getPayload()
                 .get("userId");
         return ((Number) userId).longValue();
     }
+
+    public Long extractUserIdWithRefreshToken(String refreshToken) {
+        Object userId = Jwts.parser()
+                .verifyWith(getRefreshTokenSigningKey())
+                .build()
+                .parseSignedClaims(refreshToken)
+                .getPayload()
+                .get("userId");
+        return ((Number) userId).longValue();
+    }
+
 
 
     private SecretKey getRefreshTokenSigningKey() {
@@ -83,13 +94,19 @@ public class JwtUtil {
     }
 
 
-    public boolean validateAccesTokenToken(String token, UserDetails userDetails) {
-        Long tokenUserId = extractUserId(token);
+    public boolean validateAccesTokenToken(String accessToken, UserDetails userDetails) {
+        Long tokenUserId = extractUserIdWithAccessToken(accessToken);
         Long actualUserId = ((User) userDetails).getId();
-        return tokenUserId.equals(actualUserId) && !isTokenExpired(token);
+        return tokenUserId.equals(actualUserId) && !isAccessTokenTokenExpired(accessToken);
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean validateRefreshToken(String refreshToken, UserDetails userDetails) {
+        Long userId = extractUserIdWithRefreshToken(refreshToken);
+        Long actualUserId = ((User) userDetails).getId();
+        return userId.equals(actualUserId) && !isRefreshTokenTokenExpired(refreshToken);
+    }
+
+    private boolean isAccessTokenTokenExpired(String token) {
         return Jwts.parser()
                 .verifyWith(getAccesTokenSigningKey())
                 .build()
@@ -98,5 +115,16 @@ public class JwtUtil {
                 .getExpiration()
                 .before(new Date());
     }
+
+    private boolean isRefreshTokenTokenExpired(String token) {
+        return Jwts.parser()
+                .verifyWith(getRefreshTokenSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getExpiration()
+                .before(new Date());
+    }
+
 
 }
