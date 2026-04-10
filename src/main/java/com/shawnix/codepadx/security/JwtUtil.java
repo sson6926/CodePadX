@@ -18,17 +18,21 @@ import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
-    @Value("${jwt.secret}")
-    private String secret;
+    @Value("${jwt.access_token_secret}")
+    private String accessTokenSecret;
 
-    @Value("${jwt.expiration}")
-    private int expiration;
+    @Value("${jwt.access_token_expiration}")
+    private int accessTokenExpiration;
 
-    public String generateToken(UserDetails userDetails) {
-        System.out.println(userDetails.getAuthorities());
+    @Value("${jwt.refresh_token_secret}")
+    private String refreshTokenSecret;
 
+    @Value("${jwt.refresh_token_expiration}")
+    private int refreshTokenExpiration;
+
+    public String generateAccessToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        Long userId = ((User) userDetails).getId();  // <-- thêm dòng này
+        Long userId = ((User) userDetails).getId();
 
         claims.put("userId", userId);
         claims.put("roles", userDetails.getAuthorities().stream()
@@ -39,14 +43,28 @@ public class JwtUtil {
                 .claims(claims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSigningKey())
+                .expiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
+                .signWith(getAccesTokenSigningKey())
                 .compact();
     }
 
+    public String generateRefreshToken(UserDetails userDetails) {
+        Long userId = ((User) userDetails).getId();
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+
+        return Jwts.builder()
+                .claims(claims)
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+                .signWith(getRefreshTokenSigningKey())
+                .compact();
+    }
     public Long extractUserId(String token) {
         Object userId = Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(getAccesTokenSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
@@ -55,21 +73,17 @@ public class JwtUtil {
     }
 
 
-    public String extractUsername(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+    private SecretKey getRefreshTokenSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(refreshTokenSecret);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
-
-    private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
+    private SecretKey getAccesTokenSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(accessTokenSecret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public boolean validateToken(String token, UserDetails userDetails) {
+
+    public boolean validateAccesTokenToken(String token, UserDetails userDetails) {
         Long tokenUserId = extractUserId(token);
         Long actualUserId = ((User) userDetails).getId();
         return tokenUserId.equals(actualUserId) && !isTokenExpired(token);
@@ -77,7 +91,7 @@ public class JwtUtil {
 
     private boolean isTokenExpired(String token) {
         return Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(getAccesTokenSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
